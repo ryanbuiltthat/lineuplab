@@ -82,6 +82,16 @@ class LineupBuilderViewModel(
         _assignments.update { it - positionNumber }
     }
 
+    fun loadPreset(lineupId: Long) {
+        viewModelScope.launch {
+            val lineupWithAssignments = lineupRepository.getLineup(lineupId) ?: return@launch
+            _selectedFormationId.value = lineupWithAssignments.lineup.formationId
+            val assignmentsMap = lineupWithAssignments.assignments
+                .associate { it.positionNumber to it.playerName }
+            _assignments.value = assignmentsMap
+        }
+    }
+
     fun savePreset(name: String, onSaved: () -> Unit) {
         val formationId = _selectedFormationId.value ?: return
         viewModelScope.launch {
