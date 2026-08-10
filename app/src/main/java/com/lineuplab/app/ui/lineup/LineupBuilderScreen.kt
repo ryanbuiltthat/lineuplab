@@ -43,12 +43,23 @@ import com.lineuplab.app.domain.sport.SoccerConfig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LineupBuilderScreen(teamId: Long, onBack: () -> Unit) {
-    val container = (LocalContext.current.applicationContext as LineupLabApplication).container
+fun LineupBuilderScreen(
+    teamId: Long,
+    presetId: Long? = null,
+    container: com.lineuplab.app.AppContainer = (LocalContext.current.applicationContext as LineupLabApplication).container,
+    onBack: () -> Unit = {},
+    onBrowseLineups: () -> Unit = {},
+) {
     val viewModel: LineupBuilderViewModel = viewModel(
         key = "lineup-builder-$teamId",
         factory = LineupBuilderViewModel.factory(teamId, container),
     )
+
+    androidx.compose.runtime.LaunchedEffect(presetId) {
+        if (presetId != null && presetId > 0) {
+            viewModel.loadPreset(presetId)
+        }
+    }
 
     val team by viewModel.team.collectAsStateWithLifecycle()
     val players by viewModel.players.collectAsStateWithLifecycle()
@@ -82,6 +93,7 @@ fun LineupBuilderScreen(teamId: Long, onBack: () -> Unit) {
                 },
                 actions = {
                     TextButton(onClick = { showFormationPicker = true }) { Text("Formation") }
+                    TextButton(onClick = onBrowseLineups) { Text("Browse") }
                     TextButton(
                         enabled = assignments.isNotEmpty(),
                         onClick = { showSavePreset = true },
