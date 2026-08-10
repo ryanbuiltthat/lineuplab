@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.SportsSoccer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
@@ -52,7 +53,7 @@ import com.lineuplab.app.domain.sport.SoccerConfig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TeamDetailScreen(teamId: Long, onBack: () -> Unit) {
+fun TeamDetailScreen(teamId: Long, onBack: () -> Unit, onBuildLineup: (Long) -> Unit) {
     val container = (LocalContext.current.applicationContext as LineupLabApplication).container
     val viewModel: TeamDetailViewModel = viewModel(
         key = "team-detail-$teamId",
@@ -72,6 +73,11 @@ fun TeamDetailScreen(teamId: Long, onBack: () -> Unit) {
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { onBuildLineup(teamId) }) {
+                        Icon(Icons.Filled.SportsSoccer, contentDescription = "Build lineup")
                     }
                 },
             )
