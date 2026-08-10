@@ -35,15 +35,30 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: Generate version tag
+      - name: Generate semantic version tag
         id: version
         run: |
-          VERSION_NAME=$(grep 'versionName' app/build.gradle.kts | head -1 | sed 's/.*"\(.*\)".*/\1/')
-          BUILD_NUMBER=$(git rev-list --count HEAD)
-          TAG="v${VERSION_NAME}-build.${BUILD_NUMBER}"
+          # Get base version from build.gradle.kts
+          BASE_VERSION=$(grep 'versionName' app/build.gradle.kts | head -1 | sed 's/.*"\(.*\)".*/\1/')
+
+          # Get latest git tag matching vX.Y.Z pattern
+          LATEST_TAG=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-version:refname | head -1)
+
+          if [ -z "$LATEST_TAG" ]; then
+            # No tags exist, use base version
+            TAG="v${BASE_VERSION}"
+          else
+            # Parse latest tag and increment patch version
+            CURRENT_VERSION=${LATEST_TAG#v}
+            MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
+            MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
+            PATCH=$(echo "$CURRENT_VERSION" | cut -d. -f3)
+            PATCH=$((PATCH + 1))
+            TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          fi
+
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
-          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "base_version=$BASE_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Generate changelog
         id: changelog
@@ -73,4 +88,5 @@ jobs:
           body: ${{ steps.changelog.outputs.body }}
           draft: false
           prerelease: false
-          files: app/build/outputs/apk/debug/app-debug.apk
+          files: |
+            app/build/outputs/apk/debug/app-debug.apk

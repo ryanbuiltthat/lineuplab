@@ -3,9 +3,7 @@ name: Android CI
 on:
   push:
     branches:
-      - dev
       - main
-      - "claude/**"
   pull_request:
   workflow_dispatch:
 
