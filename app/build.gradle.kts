@@ -14,7 +14,7 @@ android {
         applicationId = "com.lineuplab.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
+        versionCode = (System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1)
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -23,7 +23,19 @@ android {
         }
     }
 
+    signingConfigs {
+        create("debug") {
+            storeFile = file("keystore/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
