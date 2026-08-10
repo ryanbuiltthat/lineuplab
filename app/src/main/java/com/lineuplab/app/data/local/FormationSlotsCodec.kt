@@ -1,6 +1,8 @@
 package com.lineuplab.app.data.local
 
 import com.lineuplab.app.domain.model.FormationSlot
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 /**
