@@ -46,7 +46,21 @@ app/src/main/java/com/lineuplab/app/
 ./gradlew assembleDebug
 ```
 
-Requires JDK 17+ and the Android SDK (compileSdk 35). Every push to `dev`,
-`main`, or a `claude/**` branch runs the Android CI workflow, which executes
-unit tests and uploads a debug APK artifact (`lineuplab-debug-apk`) for
-rapid sideload testing.
+Requires JDK 17+ and the Android SDK (compileSdk 35).
+
+### Debug keystore setup
+
+To install APK updates without uninstalling the previous version, the project
+uses a stable debug keystore. On first setup, generate it with:
+
+```
+bash setup-debug-keystore.sh
+```
+
+This creates `app/keystore/debug.keystore` with default debug credentials
+(storepass: `android`, keypass: `android`). The keystore is gitignored for
+your local machine; each developer generates their own.
+
+Every push to `main` runs the Android CI workflow, which executes unit tests
+and uploads a debug APK artifact (`lineuplab-debug-apk`) for rapid sideload
+testing.
