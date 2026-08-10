@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.lineuplab.app.ui.home.HomeScreen
+import com.lineuplab.app.ui.navigation.LineupLabNavHost
 import com.lineuplab.app.ui.theme.LineupLabTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             LineupLabTheme {
-                HomeScreen()
+                LineupLabNavHost()
             }
         }
     }
