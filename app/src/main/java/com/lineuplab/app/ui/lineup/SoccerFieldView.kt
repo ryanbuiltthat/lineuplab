@@ -36,6 +36,8 @@ import com.lineuplab.app.ui.theme.PitchGreenDark
 
 private const val LINE_ALPHA = 0.85f
 private val BADGE_SIZE = 56.dp
+private val BADGE_LABEL_HEIGHT = 20.dp
+private val BADGE_COLUMN_WIDTH = BADGE_SIZE + 24.dp
 
 /**
  * Fullscreen soccer pitch: draws the field markings on a [Canvas] scaled to
@@ -142,15 +144,26 @@ private fun PositionBadge(
 ) {
     val density = LocalDensity.current
     val badgeSizePx = with(density) { BADGE_SIZE.toPx() }
+    val columnWidthPx = with(density) { BADGE_COLUMN_WIDTH.toPx() }
+    val columnHeightPx = badgeSizePx + with(density) { BADGE_LABEL_HEIGHT.toPx() }
     val centerXPx = slot.x * fieldWidthPx
     val centerYPx = (1f - slot.y) * fieldHeightPx
-    val offsetXDp = with(density) { (centerXPx - badgeSizePx / 2f).toDp() }
-    val offsetYDp = with(density) { (centerYPx - badgeSizePx / 2f).toDp() }
+
+    // Center the whole column (badge + label) on the slot's coordinate, not
+    // just the circle, then clamp so wide labels near the field edges never
+    // render off-screen.
+    val rawOffsetXPx = centerXPx - columnWidthPx / 2f
+    val clampedOffsetXPx = rawOffsetXPx.coerceIn(0f, (fieldWidthPx - columnWidthPx).coerceAtLeast(0f))
+    val rawOffsetYPx = centerYPx - badgeSizePx / 2f
+    val clampedOffsetYPx = rawOffsetYPx.coerceIn(0f, (fieldHeightPx - columnHeightPx).coerceAtLeast(0f))
+
+    val offsetXDp = with(density) { clampedOffsetXPx.toDp() }
+    val offsetYDp = with(density) { clampedOffsetYPx.toDp() }
 
     Column(
         modifier = Modifier
             .offset(x = offsetXDp, y = offsetYDp)
-            .width(BADGE_SIZE + 24.dp)
+            .width(BADGE_COLUMN_WIDTH)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

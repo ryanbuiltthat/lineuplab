@@ -118,7 +118,10 @@ fun LineupBuilderScreen(
                 slots = slots,
                 assignments = assignments,
                 onPositionClick = { position -> pickingPosition = position },
-                modifier = Modifier.fillMaxSize().padding(padding),
+                // Reserve room for the "Set Lineup" FAB, which Scaffold floats
+                // over content rather than insetting via `padding` — without
+                // this the goalkeeper badge renders underneath it.
+                modifier = Modifier.fillMaxSize().padding(padding).padding(bottom = 88.dp),
             )
         }
     }
