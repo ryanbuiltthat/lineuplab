@@ -41,14 +41,16 @@ jobs:
           # Get base version from build.gradle.kts
           BASE_VERSION=$(grep 'versionName' app/build.gradle.kts | head -1 | sed 's/.*"\(.*\)".*/\1/')
 
-          # Get latest git tag matching vX.Y.Z pattern
-          LATEST_TAG=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-version:refname | head -1)
+          # Latest tag strictly matching vX.Y.Z (excludes legacy vX.Y.Z-build.N
+          # tags from the old versioning scheme, which a looser glob would
+          # wrongly treat as semantic and mis-increment).
+          LATEST_TAG=$(git tag -l 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
 
           if [ -z "$LATEST_TAG" ]; then
-            # No tags exist, use base version
+            # No prior semantic tags, use the base version as-is
             TAG="v${BASE_VERSION}"
           else
-            # Parse latest tag and increment patch version
+            # Increment patch version from the latest semantic tag
             CURRENT_VERSION=${LATEST_TAG#v}
             MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
             MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
@@ -59,11 +61,12 @@ jobs:
 
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "base_version=$BASE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "prev_tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
 
       - name: Generate changelog
         id: changelog
         run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          PREV_TAG="${{ steps.version.outputs.prev_tag }}"
           if [ -z "$PREV_TAG" ]; then
             LOG=$(git log --oneline --no-merges | head -20)
           else
