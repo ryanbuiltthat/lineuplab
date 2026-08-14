@@ -48,18 +48,16 @@ app/src/main/java/com/lineuplab/app/
 
 Requires JDK 17+ and the Android SDK (compileSdk 35).
 
-### Debug keystore setup
+### Debug keystore
 
-To install APK updates without uninstalling the previous version, the project
-uses a stable debug keystore. On first setup, generate it with:
-
-```
-bash setup-debug-keystore.sh
-```
-
-This creates `app/keystore/debug.keystore` with default debug credentials
-(storepass: `android`, keypass: `android`). The keystore is gitignored for
-your local machine; each developer generates their own.
+Debug builds are signed with a stable, committed keystore at
+`app/keystore/debug.keystore` (storepass/keypass: `android`, alias:
+`androiddebugkey`). It's checked into the repo — not a secret, since it's
+never used for Play Store releases — so that every CI build and every
+developer machine signs with the same key. This lets you install a newer
+APK over an older one without uninstalling first; if you ever regenerate it
+(`setup-debug-keystore.sh`), every previously installed build becomes
+unupdatable until you uninstall once.
 
 Every push to `main` runs the Android CI workflow, which executes unit tests
 and uploads a debug APK artifact (`lineuplab-debug-apk`) for rapid sideload
