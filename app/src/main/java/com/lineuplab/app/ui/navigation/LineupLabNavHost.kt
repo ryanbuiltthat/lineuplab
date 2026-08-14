@@ -11,6 +11,7 @@ import com.lineuplab.app.AppContainer
 import com.lineuplab.app.LineupLabApplication
 import com.lineuplab.app.ui.lineup.LineupBuilderScreen
 import com.lineuplab.app.ui.lineup.SavedLineupsScreen
+import com.lineuplab.app.ui.stats.PlayerStatsScreen
 import com.lineuplab.app.ui.team.TeamDetailScreen
 import com.lineuplab.app.ui.team.TeamListScreen
 
@@ -30,7 +31,15 @@ fun LineupLabNavHost(container: AppContainer = (LocalContext.current.application
                 teamId = teamId,
                 onBack = navController::popBackStack,
                 onBuildLineup = { navController.navigate(Routes.lineupBuilder(teamId)) },
+                onViewStats = { navController.navigate(Routes.playerStats(teamId)) },
             )
+        }
+        composable(
+            route = Routes.PLAYER_STATS,
+            arguments = listOf(navArgument(Routes.PLAYER_STATS_ARG) { type = NavType.LongType }),
+        ) { backStackEntry ->
+            val teamId = backStackEntry.arguments?.getLong(Routes.PLAYER_STATS_ARG) ?: return@composable
+            PlayerStatsScreen(teamId = teamId, onBack = navController::popBackStack)
         }
         composable(
             route = Routes.LINEUP_BUILDER,

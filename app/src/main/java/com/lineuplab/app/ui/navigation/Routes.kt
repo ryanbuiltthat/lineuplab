@@ -9,9 +9,12 @@ object Routes {
     const val LINEUP_BUILDER_PRESET_ARG = "presetId"
     const val SAVED_LINEUPS = "teams/{teamId}/lineups"
     const val SAVED_LINEUPS_ARG = "teamId"
+    const val PLAYER_STATS = "teams/{teamId}/stats"
+    const val PLAYER_STATS_ARG = "teamId"
 
     fun teamDetail(teamId: Long) = "teams/$teamId"
     fun lineupBuilder(teamId: Long) = "teams/$teamId/lineup"
     fun lineupBuilderWithPreset(teamId: Long, presetId: Long) = "teams/$teamId/lineup?presetId=$presetId"
     fun savedLineups(teamId: Long) = "teams/$teamId/lineups"
+    fun playerStats(teamId: Long) = "teams/$teamId/stats"
 }
